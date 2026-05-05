@@ -3,9 +3,11 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const swaggerUi = require('swagger-ui-express');
 
 // Importar configuración y middlewares
-const databaseConfig = require('./config/database');
+const databaseConfig = require('./config/database-mock'); // Usando versión simulada
+const swaggerSpec = require('./config/swagger');
 const {
   errorHandler,
   notFound,
@@ -56,6 +58,83 @@ if (process.env.NODE_ENV === 'development') {
   app.use(requestLogger);
 }
 
+// Configurar documentación Swagger
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'API User Behavior - Documentación',
+  customfavIcon: '/assets/favicon.ico',
+  swaggerOptions: {
+    docExpansion: 'list',
+    filter: true,
+    showRequestDuration: true
+  }
+}));
+
+// Endpoint para obtener el spec JSON
+app.get('/api/docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     tags: [Sistema]
+ *     summary: Health check del sistema
+ *     description: Verifica el estado de salud de la API y la conexión a la base de datos
+ *     responses:
+ *       200:
+ *         description: Sistema funcionando correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/StandardResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         status:
+ *                           type: string
+ *                           example: "healthy"
+ *                         timestamp:
+ *                           type: string
+ *                           format: date-time
+ *                         version:
+ *                           type: string
+ *                           example: "1.0.0"
+ *                         environment:
+ *                           type: string
+ *                           example: "development"
+ *                         database:
+ *                           type: string
+ *                           example: "ok"
+ *                         uptime:
+ *                           type: number
+ *                           description: "Tiempo activo del servidor en segundos"
+ *                           example: 145.23
+ *             examples:
+ *               healthy:
+ *                 summary: Sistema saludable
+ *                 value:
+ *                   success: true
+ *                   message: "API funcionando correctamente"
+ *                   data:
+ *                     status: "healthy"
+ *                     timestamp: "2026-05-05T00:56:09.835Z"
+ *                     version: "1.0.0"
+ *                     environment: "development"
+ *                     database: "ok"
+ *                     uptime: 145.23
+ *       503:
+ *         description: Problemas de conectividad
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 // Ruta de health check
 app.get('/health', async (req, res) => {
   try {
@@ -86,6 +165,74 @@ app.get('/health', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     tags: [Sistema]
+ *     summary: Información principal de la API
+ *     description: Endpoint de bienvenida que proporciona información sobre la API y sus endpoints disponibles
+ *     responses:
+ *       200:
+ *         description: Información de la API obtenida correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/StandardResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         version:
+ *                           type: string
+ *                           example: "1.0.0"
+ *                         author:
+ *                           type: string
+ *                           example: "Aaron Nuñez Torres"
+ *                         description:
+ *                           type: string
+ *                           example: "API para registro y análisis de eventos de usuario con MongoDB"
+ *                         endpoints:
+ *                           type: object
+ *                           properties:
+ *                             eventos:
+ *                               type: string
+ *                               example: "/api/events"
+ *                             usuarios:
+ *                               type: string
+ *                               example: "/api/users"
+ *                             aplicaciones:
+ *                               type: string
+ *                               example: "/api/applications"
+ *                             métricas:
+ *                               type: string
+ *                               example: "/api/metrics"
+ *                             salud:
+ *                               type: string
+ *                               example: "/health"
+ *                         documentacion:
+ *                           type: string
+ *                           example: "/api/docs"
+ *             examples:
+ *               welcome:
+ *                 summary: Respuesta de bienvenida
+ *                 value:
+ *                   success: true
+ *                   message: "API REST para análisis de comportamiento de usuarios"
+ *                   data:
+ *                     version: "1.0.0"
+ *                     author: "Aaron Nuñez Torres"
+ *                     description: "API para registro y análisis de eventos de usuario con MongoDB"
+ *                     endpoints:
+ *                       eventos: "/api/events"
+ *                       usuarios: "/api/users"
+ *                       aplicaciones: "/api/applications"
+ *                       métricas: "/api/metrics"
+ *                       salud: "/health"
+ *                     documentacion: "/api/docs"
+ */
 // Ruta principal de bienvenida
 app.get('/', (req, res) => {
   res.json({
