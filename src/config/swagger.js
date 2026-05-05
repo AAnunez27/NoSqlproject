@@ -1,31 +1,72 @@
 const swaggerJSDoc = require('swagger-jsdoc');
 
-// Configuración dinámica de servidores basada en el entorno
+// Configuración dinámica de servidores con autodetección inteligente
 const getServers = () => {
   const servers = [];
+  const currentPort = process.env.PORT || 3000;
+  const nodeEnv = process.env.NODE_ENV || 'development';
 
-  // Servidor local (siempre disponible en desarrollo)
-  if (process.env.NODE_ENV !== 'production') {
+  // Autodetección del servidor actual
+  if (nodeEnv === 'production') {
+    // PRODUCCIÓN: Detectar automáticamente la URL de Render u otros providers
+
+    // Render proporciona RENDER_EXTERNAL_URL automáticamente
+    if (process.env.RENDER_EXTERNAL_URL) {
+      servers.push({
+        url: process.env.RENDER_EXTERNAL_URL,
+        description: 'Servidor de producción (Render + MongoDB Atlas)'
+      });
+    }
+    // Heroku proporciona estas variables
+    else if (process.env.HEROKU_APP_NAME) {
+      servers.push({
+        url: `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`,
+        description: 'Servidor de producción (Heroku + MongoDB Atlas)'
+      });
+    }
+    // Vercel proporciona VERCEL_URL
+    else if (process.env.VERCEL_URL) {
+      servers.push({
+        url: `https://${process.env.VERCEL_URL}`,
+        description: 'Servidor de producción (Vercel + MongoDB Atlas)'
+      });
+    }
+    // Railway proporciona RAILWAY_STATIC_URL
+    else if (process.env.RAILWAY_STATIC_URL) {
+      servers.push({
+        url: process.env.RAILWAY_STATIC_URL,
+        description: 'Servidor de producción (Railway + MongoDB Atlas)'
+      });
+    }
+    // Fallback: construir URL genérica
+    else {
+      const protocol = process.env.HTTPS ? 'https' : 'http';
+      const host = process.env.HOST || 'localhost';
+      servers.push({
+        url: `${protocol}://${host}:${currentPort}`,
+        description: 'Servidor de producción (MongoDB Atlas)'
+      });
+    }
+
+  } else {
+    // DESARROLLO: Servidor local con puerto autodetectado
     servers.push({
-      url: 'http://localhost:3000',
-      description: 'Servidor de desarrollo local'
+      url: `http://localhost:${currentPort}`,
+      description: `Servidor de desarrollo local (Puerto ${currentPort} + Datos simulados)`
     });
+
+    // En desarrollo, también mostrar referencia a producción si existe
+    if (process.env.RENDER_EXTERNAL_URL) {
+      servers.push({
+        url: process.env.RENDER_EXTERNAL_URL,
+        description: 'Servidor de producción (Render + MongoDB Atlas - Referencia)'
+      });
+    }
   }
 
-  // Servidor de producción en Render
-  if (process.env.NODE_ENV === 'production') {
-    // En producción, usar la URL real de Render
-    const renderUrl = process.env.RENDER_EXTERNAL_URL || 'https://nosql-api.onrender.com';
-    servers.push({
-      url: renderUrl,
-      description: 'Servidor de producción en Render'
-    });
-  } else {
-    // En desarrollo, mostrar también el servidor de producción como referencia
-    servers.push({
-      url: 'https://nosql-api.onrender.com',
-      description: 'Servidor de producción en Render (referencia)'
-    });
+  // Log para debugging (solo en desarrollo)
+  if (nodeEnv === 'development') {
+    console.log('🌐 Servidores Swagger detectados:', servers.map(s => `${s.url} (${s.description})`));
   }
 
   return servers;

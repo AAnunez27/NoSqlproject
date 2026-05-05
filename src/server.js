@@ -6,7 +6,10 @@ const rateLimit = require('express-rate-limit');
 const swaggerUi = require('swagger-ui-express');
 
 // Importar configuración y middlewares
-const databaseConfig = require('./config/database-mock'); // Usando versión simulada
+// Selección inteligente de base de datos según entorno
+const databaseConfig = process.env.NODE_ENV === 'production'
+  ? require('./config/database')      // MongoDB Atlas real en producción
+  : require('./config/database-mock'); // Modo simulado en desarrollo
 const swaggerSpec = require('./config/swagger');
 const {
   errorHandler,
@@ -270,6 +273,10 @@ app.use(errorHandler);
 // Función para iniciar el servidor
 async function startServer() {
   try {
+    // Información sobre la configuración de base de datos
+    const isProduction = process.env.NODE_ENV === 'production';
+    console.log(`🗄️  Configuración de base de datos: ${isProduction ? 'MongoDB Atlas (Producción)' : 'Modo simulado (Desarrollo)'}`);
+
     // Conectar a MongoDB
     console.log('🔌 Conectando a MongoDB...');
     await databaseConfig.connect();
