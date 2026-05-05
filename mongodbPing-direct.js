@@ -10,8 +10,12 @@ const { MongoClient } = require('mongodb');
 async function testDirectConnection() {
     console.log('🚀 Testing MongoDB Atlas with DIRECT connection (no SRV)...\n');
 
-    // Connection string directo para cluster0 en sa-east-1
-    const directUri = 'mongodb://DB_USER:ROTATED_PASSWORD@cluster0-shard-00-00.qm18xrk.mongodb.net:27017,cluster0-shard-00-01.qm18xrk.mongodb.net:27017,cluster0-shard-00-02.qm18xrk.mongodb.net:27017/test?ssl=true&replicaSet=atlas-imlmqt-shard-0&authSource=admin&retryWrites=true&w=majority&appName=Cluster0';
+    // Leer credenciales desde variables de entorno (nunca hardcodear credenciales)
+    const directUri = process.env.DATABASE_URL_DIRECT || process.env.DATABASE_URL;
+    if (!directUri) {
+        console.error('❌ DATABASE_URL_DIRECT o DATABASE_URL no están definidas en el archivo .env');
+        process.exit(1);
+    }
 
     console.log('🔧 Using direct connection (no SRV)');
 

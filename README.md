@@ -69,15 +69,19 @@ curl http://localhost:3000/health
 
 ### Variables de Entorno
 
-El archivo `.env` ya está configurado:
+Copia `.env.example` a `.env` y completa tus credenciales:
+
+```bash
+cp .env.example .env
+```
 
 ```env
 # Base de datos principal
-DATABASE_URL=mongodb+srv://DB_USER:ROTATED_PASSWORD@cluster0.qm18xrk.mongodb.net/?appName=Cluster0
+DATABASE_URL=mongodb+srv://<usuario>:<contraseña>@<cluster>.mongodb.net/?appName=Cluster0
 COLECCION=DATABASE
 
 # Base de datos para testing
-DATABASE_URL_TEST=mongodb+srv://DB_USER:ROTATED_PASSWORD@cluster0.qm18xrk.mongodb.net/test_database?appName=Cluster0
+DATABASE_URL_TEST=mongodb+srv://<usuario>:<contraseña>@<cluster>.mongodb.net/test_database?appName=Cluster0
 COLECCION_TEST=TEST_DATABASE
 
 # Configuración del servidor

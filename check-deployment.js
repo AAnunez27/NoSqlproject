@@ -102,10 +102,10 @@ if (allEnvVarsPresent) {
   console.log('1. Commit y push a GitHub');
   console.log('2. Configurar variables en Render dashboard');
   console.log('3. Hacer deployment desde Render');
-  console.log('\n🔗 Variables para Render:');
-  console.log(`DATABASE_URL=${requiredEnvVars.DATABASE_URL}`);
-  console.log(`COLECCION=${requiredEnvVars.COLECCION}`);
-  console.log('NODE_ENV=production');
+  console.log('\n🔗 Variables para configurar en Render dashboard (NO publicar los valores):');
+  console.log('   DATABASE_URL=<tu_mongodb_connection_string>');
+  console.log(`   COLECCION=${requiredEnvVars.COLECCION}`);
+  console.log('   NODE_ENV=production');
   process.exit(0);
 } else {
   console.log('❌ PROBLEMAS DETECTADOS - CORREGIR ANTES DEL DEPLOYMENT');

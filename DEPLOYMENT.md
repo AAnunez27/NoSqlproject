@@ -7,10 +7,13 @@ En Render, configura estas variables en el dashboard:
 ```env
 NODE_ENV=production
 PORT=3000
-DATABASE_URL=mongodb+srv://DB_USER:ROTATED_PASSWORD@cluster0.qm18xrk.mongodb.net/DATABASE?appName=Cluster0
+DATABASE_URL=mongodb+srv://<usuario>:<contraseña>@<cluster>.mongodb.net/DATABASE?appName=Cluster0
 COLECCION=DATABASE
 CORS_ORIGIN=*
 ```
+
+> ⚠️ **Nunca pongas credenciales reales en archivos de documentación o código fuente.**
+> Configura estas variables directamente en el dashboard de Render.
 
 ## 🔧 Configuración de Servicio Render
 

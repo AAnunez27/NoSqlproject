@@ -1,2 +1,11 @@
+# Variables de entorno (NUNCA commitear)
 .env
+.env.local
+.env.production
+.env.*.local
+
+# Dependencias
 node_modules
+
+# Archivos temporales
+temp_test.json
