@@ -175,78 +175,107 @@ const options = {
               type: 'string',
               description: 'ID único del evento'
             },
-            usuarioId: {
+            usuario_id: {
               type: 'string',
               description: 'ID del usuario que generó el evento'
             },
-            aplicacionId: {
+            sesion_id: {
+              type: 'string',
+              description: 'ID de la sesión del usuario'
+            },
+            aplicacion_id: {
               type: 'string',
               description: 'ID de la aplicación donde ocurrió el evento'
             },
-            tipoEvento: {
+            tipo_evento: {
               type: 'string',
-              enum: ['click', 'view', 'scroll', 'form_submit', 'purchase', 'search', 'download', 'custom'],
               description: 'Tipo de evento registrado'
             },
-            datos: {
+            metadata: {
               type: 'object',
-              description: 'Datos específicos del evento (estructura flexible)',
-              properties: {
-                elemento: { type: 'string', description: 'Elemento interactuado' },
-                valor: { type: 'string', description: 'Valor asociado' },
-                url: { type: 'string', description: 'URL donde ocurrió el evento' },
-                metadata: { type: 'object', description: 'Metadatos adicionales' }
-              }
+              description: 'Metadatos específicos del evento (estructura flexible)'
             },
             timestamp: {
               type: 'string',
               format: 'date-time',
               description: 'Momento exacto del evento'
             },
-            ip: {
+            ip_usuario: {
               type: 'string',
               description: 'Dirección IP del usuario'
             },
-            userAgent: {
+            user_agent: {
               type: 'string',
               description: 'User-Agent del navegador'
+            },
+            url_origen: {
+              type: 'string',
+              description: 'URL donde se originó el evento'
             }
           },
-          required: ['usuarioId', 'aplicacionId', 'tipoEvento', 'timestamp']
+          required: ['usuario_id', 'sesion_id', 'aplicacion_id', 'tipo_evento', 'timestamp']
         },
 
         // Schema para crear evento
         EventoCrear: {
           type: 'object',
           properties: {
-            usuarioId: {
+            usuario_id: {
               type: 'string',
               description: 'ID del usuario (requerido)',
-              example: 'user_12345'
+              example: 'user_12345',
+              minLength: 1,
+              maxLength: 100
             },
-            aplicacionId: {
+            sesion_id: {
+              type: 'string',
+              description: 'ID de la sesión (requerido)',
+              example: 'session_abc123',
+              minLength: 1,
+              maxLength: 100
+            },
+            aplicacion_id: {
               type: 'string',
               description: 'ID de la aplicación (requerido)',
-              example: 'app_ecommerce'
+              example: 'app_ecommerce',
+              minLength: 1,
+              maxLength: 100
             },
-            tipoEvento: {
+            tipo_evento: {
               type: 'string',
-              enum: ['click', 'view', 'scroll', 'form_submit', 'purchase', 'search', 'download', 'custom'],
-              description: 'Tipo de evento',
-              example: 'click'
+              description: 'Tipo de evento (requerido)',
+              example: 'click',
+              minLength: 1,
+              maxLength: 50
             },
-            datos: {
+            metadata: {
               type: 'object',
-              description: 'Datos del evento',
+              description: 'Metadatos del evento',
               example: {
                 elemento: 'boton_comprar',
                 valor: 'producto_123',
                 url: '/productos/123',
                 precio: 29.99
               }
+            },
+            ip_usuario: {
+              type: 'string',
+              description: 'IP del usuario (opcional)',
+              format: 'ipv4'
+            },
+            user_agent: {
+              type: 'string',
+              description: 'User-Agent del navegador (opcional)',
+              maxLength: 500
+            },
+            url_origen: {
+              type: 'string',
+              description: 'URL donde ocurrió el evento (opcional)',
+              format: 'uri',
+              maxLength: 500
             }
           },
-          required: ['usuarioId', 'aplicacionId', 'tipoEvento']
+          required: ['usuario_id', 'sesion_id', 'aplicacion_id', 'tipo_evento']
         },
 
         // Schema para usuario
@@ -255,32 +284,73 @@ const options = {
           properties: {
             _id: {
               type: 'string',
-              description: 'ID único del usuario'
+              description: 'ID único del usuario en la base de datos'
             },
-            usuarioId: {
+            usuario_id: {
               type: 'string',
               description: 'ID externo del usuario'
             },
-            propiedades: {
+            nombre: {
+              type: 'string',
+              description: 'Nombre del usuario'
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              description: 'Email del usuario'
+            },
+            metadata: {
               type: 'object',
-              description: 'Propiedades del usuario',
-              properties: {
-                nombre: { type: 'string' },
-                email: { type: 'string', format: 'email' },
-                edad: { type: 'number' },
-                genero: { type: 'string' },
-                ubicacion: { type: 'string' }
-              }
+              description: 'Metadatos adicionales del usuario'
             },
-            fechaRegistro: {
+            fecha_registro: {
               type: 'string',
-              format: 'date-time'
+              format: 'date-time',
+              description: 'Fecha de registro del usuario'
             },
-            ultimaActividad: {
+            ultima_actividad: {
               type: 'string',
-              format: 'date-time'
+              format: 'date-time',
+              description: 'Fecha de última actividad'
             }
           }
+        },
+
+        // Schema para crear usuario
+        UsuarioCrear: {
+          type: 'object',
+          properties: {
+            usuario_id: {
+              type: 'string',
+              description: 'ID único del usuario (opcional, se genera si no se proporciona)',
+              minLength: 1,
+              maxLength: 100
+            },
+            nombre: {
+              type: 'string',
+              description: 'Nombre del usuario (requerido)',
+              minLength: 1,
+              maxLength: 100,
+              example: 'Juan Pérez'
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              description: 'Email del usuario (requerido)',
+              maxLength: 255,
+              example: 'juan@ejemplo.com'
+            },
+            metadata: {
+              type: 'object',
+              description: 'Metadatos adicionales del usuario',
+              example: {
+                edad: 30,
+                ciudad: 'Madrid',
+                preferencias: { tema: 'oscuro' }
+              }
+            }
+          },
+          required: ['nombre', 'email']
         },
 
         // Schema para aplicación
@@ -289,9 +359,9 @@ const options = {
           properties: {
             _id: {
               type: 'string',
-              description: 'ID único de la aplicación'
+              description: 'ID único de la aplicación en la base de datos'
             },
-            aplicacionId: {
+            aplicacion_id: {
               type: 'string',
               description: 'ID externo de la aplicación'
             },
@@ -299,42 +369,243 @@ const options = {
               type: 'string',
               description: 'Nombre de la aplicación'
             },
-            dominio: {
+            descripcion: {
               type: 'string',
-              description: 'Dominio principal'
+              description: 'Descripción de la aplicación'
+            },
+            version: {
+              type: 'string',
+              description: 'Versión de la aplicación'
+            },
+            plataforma: {
+              type: 'string',
+              enum: ['web', 'mobile', 'desktop'],
+              description: 'Plataforma de la aplicación'
+            },
+            url_base: {
+              type: 'string',
+              format: 'uri',
+              description: 'URL base de la aplicación'
             },
             configuracion: {
               type: 'object',
-              description: 'Configuración específica'
+              description: 'Configuración específica de la aplicación'
             },
-            fechaCreacion: {
+            metadata: {
+              type: 'object',
+              description: 'Metadatos adicionales'
+            },
+            fecha_creacion: {
               type: 'string',
-              format: 'date-time'
+              format: 'date-time',
+              description: 'Fecha de creación'
             }
           }
         },
 
+        // Schema para crear aplicación
+        AplicacionCrear: {
+          type: 'object',
+          properties: {
+            aplicacion_id: {
+              type: 'string',
+              description: 'ID único de la aplicación (opcional, se genera si no se proporciona)',
+              minLength: 1,
+              maxLength: 100
+            },
+            nombre: {
+              type: 'string',
+              description: 'Nombre de la aplicación (requerido)',
+              minLength: 1,
+              maxLength: 100,
+              example: 'Mi App E-commerce'
+            },
+            descripcion: {
+              type: 'string',
+              description: 'Descripción de la aplicación',
+              maxLength: 500,
+              example: 'Tienda online de productos electrónicos'
+            },
+            version: {
+              type: 'string',
+              description: 'Versión de la aplicación',
+              maxLength: 20,
+              example: '1.0.0'
+            },
+            plataforma: {
+              type: 'string',
+              enum: ['web', 'mobile', 'desktop'],
+              description: 'Plataforma de la aplicación (requerido)',
+              example: 'web'
+            },
+            url_base: {
+              type: 'string',
+              format: 'uri',
+              description: 'URL base de la aplicación',
+              maxLength: 500,
+              example: 'https://miapp.com'
+            },
+            configuracion: {
+              type: 'object',
+              description: 'Configuración específica',
+              example: {
+                analytics_enabled: true,
+                max_events_per_session: 1000
+              }
+            },
+            metadata: {
+              type: 'object',
+              description: 'Metadatos adicionales',
+              example: {
+                owner: 'team-frontend',
+                environment: 'production'
+              }
+            }
+          },
+          required: ['nombre', 'plataforma']
+        },
+
+        // Schema para sesión
+        Sesion: {
+          type: 'object',
+          properties: {
+            _id: {
+              type: 'string',
+              description: 'ID único de la sesión en la base de datos'
+            },
+            sesion_id: {
+              type: 'string',
+              description: 'ID externo de la sesión'
+            },
+            usuario_id: {
+              type: 'string',
+              description: 'ID del usuario asociado'
+            },
+            aplicacion_id: {
+              type: 'string',
+              description: 'ID de la aplicación'
+            },
+            ip_usuario: {
+              type: 'string',
+              description: 'Dirección IP del usuario'
+            },
+            user_agent: {
+              type: 'string',
+              description: 'User-Agent del navegador'
+            },
+            plataforma: {
+              type: 'string',
+              enum: ['web', 'mobile', 'desktop'],
+              description: 'Plataforma utilizada'
+            },
+            dispositivo: {
+              type: 'string',
+              description: 'Información del dispositivo'
+            },
+            fecha_inicio: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Fecha de inicio de la sesión'
+            },
+            fecha_fin: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Fecha de fin de la sesión'
+            },
+            activa: {
+              type: 'boolean',
+              description: 'Si la sesión está activa'
+            },
+            metadata: {
+              type: 'object',
+              description: 'Metadatos adicionales de la sesión'
+            }
+          }
+        },
+
+        // Schema para crear sesión
+        SesionCrear: {
+          type: 'object',
+          properties: {
+            sesion_id: {
+              type: 'string',
+              description: 'ID único de la sesión (opcional, se genera si no se proporciona)',
+              minLength: 1,
+              maxLength: 100
+            },
+            usuario_id: {
+              type: 'string',
+              description: 'ID del usuario (requerido)',
+              minLength: 1,
+              maxLength: 100,
+              example: 'user_12345'
+            },
+            aplicacion_id: {
+              type: 'string',
+              description: 'ID de la aplicación (requerido)',
+              minLength: 1,
+              maxLength: 100,
+              example: 'app_ecommerce'
+            },
+            ip_usuario: {
+              type: 'string',
+              format: 'ipv4',
+              description: 'Dirección IP del usuario (opcional)'
+            },
+            user_agent: {
+              type: 'string',
+              maxLength: 500,
+              description: 'User-Agent del navegador (opcional)'
+            },
+            plataforma: {
+              type: 'string',
+              enum: ['web', 'mobile', 'desktop'],
+              description: 'Plataforma utilizada (opcional)'
+            },
+            dispositivo: {
+              type: 'string',
+              maxLength: 100,
+              description: 'Información del dispositivo (opcional)'
+            },
+            metadata: {
+              type: 'object',
+              description: 'Metadatos adicionales',
+              example: {
+                origen: 'google',
+                campana: 'promo_verano'
+              }
+            }
+          },
+          required: ['usuario_id', 'aplicacion_id']
+        },
+
         // Schema para métricas
+        // Schema para métricas básicas
         MetricasBasicas: {
           type: 'object',
           properties: {
-            totalEventos: {
+            total_eventos: {
               type: 'number',
               description: 'Total de eventos registrados'
             },
-            usuariosActivos: {
+            usuarios_activos: {
               type: 'number',
               description: 'Usuarios activos únicos'
             },
-            aplicacionesActivas: {
+            aplicaciones_activas: {
               type: 'number',
               description: 'Aplicaciones con actividad'
             },
-            eventosPorTipo: {
+            eventos_por_tipo: {
               type: 'object',
               description: 'Distribución de eventos por tipo',
               additionalProperties: {
                 type: 'number'
+              },
+              example: {
+                click: 1500,
+                view: 3200,
+                purchase: 150
               }
             },
             periodo: {
@@ -342,6 +613,47 @@ const options = {
               properties: {
                 inicio: { type: 'string', format: 'date-time' },
                 fin: { type: 'string', format: 'date-time' }
+              },
+              description: 'Periodo de tiempo de las métricas'
+            },
+            promedio_eventos_por_usuario: {
+              type: 'number',
+              description: 'Promedio de eventos por usuario'
+            },
+            sesiones_activas: {
+              type: 'number',
+              description: 'Número de sesiones activas'
+            }
+          }
+        },
+
+        // Schema para resumen de métricas
+        MetricasResumen: {
+          type: 'object',
+          properties: {
+            estadisticas_globales: {
+              type: 'object',
+              properties: {
+                total_usuarios: { type: 'number' },
+                total_aplicaciones: { type: 'number' },
+                total_sesiones: { type: 'number' },
+                total_eventos: { type: 'number' }
+              }
+            },
+            tendencias: {
+              type: 'object',
+              properties: {
+                eventos_ultimas_24h: { type: 'number' },
+                usuarios_nuevos_hoy: { type: 'number' },
+                sesiones_activas_ahora: { type: 'number' }
+              }
+            },
+            salud_sistema: {
+              type: 'object',
+              properties: {
+                status: { type: 'string', enum: ['healthy', 'warning', 'error'] },
+                latencia_promedio: { type: 'number' },
+                tasa_errores: { type: 'number' }
               }
             }
           }

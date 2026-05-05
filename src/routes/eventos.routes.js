@@ -20,21 +20,26 @@ const { validacion, esquemas } = require('../middleware/validacion');
  *             click_event:
  *               summary: Evento de click
  *               value:
- *                 usuarioId: "user_12345"
- *                 aplicacionId: "app_ecommerce"
- *                 tipoEvento: "click"
- *                 datos:
+ *                 usuario_id: "user_12345"
+ *                 sesion_id: "session_abc123"
+ *                 aplicacion_id: "app_ecommerce"
+ *                 tipo_evento: "click"
+ *                 metadata:
  *                   elemento: "boton_comprar"
  *                   valor: "producto_123"
  *                   url: "/productos/123"
  *                   precio: 29.99
+ *                 ip_usuario: "192.168.1.100"
+ *                 user_agent: "Mozilla/5.0..."
+ *                 url_origen: "https://mitienda.com/productos/123"
  *             view_event:
  *               summary: Evento de visualización
  *               value:
- *                 usuarioId: "user_67890"
- *                 aplicacionId: "app_blog"
- *                 tipoEvento: "view"
- *                 datos:
+ *                 usuario_id: "user_67890"
+ *                 sesion_id: "session_def456"
+ *                 aplicacion_id: "app_blog"
+ *                 tipo_evento: "view"
+ *                 metadata:
  *                   elemento: "articulo"
  *                   valor: "articulo_456"
  *                   url: "/blog/articulo-456"
@@ -89,29 +94,33 @@ router.post('/',
  *           default: 20
  *         description: Cantidad de eventos por página
  *       - in: query
- *         name: usuarioId
+ *         name: usuario_id
  *         schema:
  *           type: string
  *         description: Filtrar por ID de usuario específico
  *       - in: query
- *         name: aplicacionId
+ *         name: aplicacion_id
  *         schema:
  *           type: string
  *         description: Filtrar por ID de aplicación
  *       - in: query
- *         name: tipoEvento
+ *         name: sesion_id
  *         schema:
  *           type: string
- *           enum: [click, view, scroll, form_submit, purchase, search, download, custom]
+ *         description: Filtrar por ID de sesión específica
+ *       - in: query
+ *         name: tipo_evento
+ *         schema:
+ *           type: string
  *         description: Filtrar por tipo de evento
  *       - in: query
- *         name: fechaInicio
+ *         name: fecha_inicio
  *         schema:
  *           type: string
  *           format: date-time
  *         description: Fecha y hora de inicio del rango (ISO 8601)
  *       - in: query
- *         name: fechaFin
+ *         name: fecha_fin
  *         schema:
  *           type: string
  *           format: date-time
@@ -191,10 +200,9 @@ router.get('/',
  *           default: 20
  *         description: Eventos por página
  *       - in: query
- *         name: tipoEvento
+ *         name: tipo_evento
  *         schema:
  *           type: string
- *           enum: [click, view, scroll, form_submit, purchase, search, download, custom]
  *         description: Filtrar por tipo específico de evento
  *     responses:
  *       200:
