@@ -1,5 +1,36 @@
 const swaggerJSDoc = require('swagger-jsdoc');
 
+// Configuración dinámica de servidores basada en el entorno
+const getServers = () => {
+  const servers = [];
+  
+  // Servidor local (siempre disponible en desarrollo)
+  if (process.env.NODE_ENV !== 'production') {
+    servers.push({
+      url: 'http://localhost:3000',
+      description: 'Servidor de desarrollo local'
+    });
+  }
+  
+  // Servidor de producción en Render
+  if (process.env.NODE_ENV === 'production') {
+    // En producción, usar la URL real de Render
+    const renderUrl = process.env.RENDER_EXTERNAL_URL || 'https://nosql-api.onrender.com';
+    servers.push({
+      url: renderUrl,
+      description: 'Servidor de producción en Render'
+    });
+  } else {
+    // En desarrollo, mostrar también el servidor de producción como referencia
+    servers.push({
+      url: 'https://nosql-api.onrender.com',
+      description: 'Servidor de producción en Render (referencia)'
+    });
+  }
+  
+  return servers;
+};
+
 const options = {
   definition: {
     openapi: '3.0.0',
@@ -45,16 +76,7 @@ const options = {
         url: 'https://opensource.org/licenses/MIT'
       }
     },
-    servers: [
-      {
-        url: 'http://localhost:3000',
-        description: 'Servidor de desarrollo'
-      },
-      {
-        url: 'https://api.user-behavior.com',
-        description: 'Servidor de producción'
-      }
-    ],
+    servers: getServers(),
     tags: [
       {
         name: 'Sistema',
