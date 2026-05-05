@@ -11,7 +11,8 @@
     "test:coverage": "jest --coverage",
     "test:integration": "jest --testNamePattern='Integration'",
     "lint": "eslint src/ tests/",
-    "lint:fix": "eslint src/ tests/ --fix"
+    "lint:fix": "eslint src/ tests/ --fix",
+    "check-deploy": "node check-deployment.js"
   },
   "keywords": [
     "api",

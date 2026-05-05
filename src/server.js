@@ -128,7 +128,7 @@ async function startServer() {
     await databaseConfig.connect();
 
     // Iniciar servidor
-    const server = app.listen(PORT, () => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
       console.log(`📊 Ambiente: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🌐 URL: http://localhost:${PORT}`);
@@ -142,6 +142,11 @@ async function startServer() {
       console.log('   GET    /api/metrics/health   - Estado del sistema');
       console.log('   GET    /health               - Health check');
     });
+
+    // Configurar timeout del servidor
+    server.timeout = 120000; // 2 minutos
+    server.keepAliveTimeout = 120000;
+    server.headersTimeout = 120000;
 
     // Manejo de cierre graceful
     const gracefulShutdown = async (signal) => {
@@ -186,6 +191,27 @@ async function startServer() {
 
   } catch (error) {
     console.error('❌ Error al iniciar el servidor:', error.message);
+    console.error('📊 Stack trace completo:', error.stack);
+    console.error('🔧 Variables de entorno:');
+    console.error(`   DATABASE_URL: ${process.env.DATABASE_URL ? 'Configurada' : 'NO CONFIGURADA'}`);
+    console.error(`   COLECCION: ${process.env.COLECCION || 'NO CONFIGURADA'}`);
+    console.error(`   PORT: ${process.env.PORT || 'NO CONFIGURADA'}`);
+    console.error(`   NODE_ENV: ${process.env.NODE_ENV || 'NO CONFIGURADA'}`);
+    console.error('🔧 Posibles soluciones:');
+    console.error('   1. Verificar variables de entorno DATABASE_URL');
+    console.error('   2. Comprobar conectividad a MongoDB Atlas');
+    console.error('   3. Revisar configuración de red y firewall');
+
+    // Intentar cerrar conexiones antes de salir
+    try {
+      if (databaseConfig && databaseConfig.disconnect) {
+        await databaseConfig.disconnect();
+        console.log('✅ Conexión DB cerrada correctamente');
+      }
+    } catch (disconnectError) {
+      console.error('⚠️ Error cerrando conexión DB:', disconnectError.message);
+    }
+
     process.exit(1);
   }
 }
