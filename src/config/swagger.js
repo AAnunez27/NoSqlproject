@@ -3,7 +3,7 @@ const swaggerJSDoc = require('swagger-jsdoc');
 // Configuración dinámica de servidores basada en el entorno
 const getServers = () => {
   const servers = [];
-  
+
   // Servidor local (siempre disponible en desarrollo)
   if (process.env.NODE_ENV !== 'production') {
     servers.push({
@@ -11,7 +11,7 @@ const getServers = () => {
       description: 'Servidor de desarrollo local'
     });
   }
-  
+
   // Servidor de producción en Render
   if (process.env.NODE_ENV === 'production') {
     // En producción, usar la URL real de Render
@@ -27,7 +27,7 @@ const getServers = () => {
       description: 'Servidor de producción en Render (referencia)'
     });
   }
-  
+
   return servers;
 };
 
